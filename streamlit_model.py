@@ -6,7 +6,6 @@ import regex
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
-#from wordcloud import WordCloud
 from string import punctuation 
 from underthesea import word_tokenize, pos_tag, sent_tokenize
 import re
@@ -23,15 +22,28 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 # GUI
 st.image('photo/shopee_11zon.jpg')
 st.title("Data Science Capstone Project ")
-st.write("#### Sentiment Analysis - Shopee E-commerce Plattform")
+st.write("#### Project name: Sentiment Analysis - Shopee E-commerce Plattform")
+st.write("#### by Tung Nguyen ")
+st.write("---------------------------------------------------")
 
 
 # PROCESS
 
 # 1. Read Processed_Data
 #@st.cache
-df = pd.read_csv("shopee_final.csv", encoding='utf-8')
-
+df = pd.read_csv("new_shopee.csv", encoding='utf-8')
+df3a= pd.read_json("json/3a.json")
+df3b= pd.read_json("json/3b.json")
+df2a= pd.read_json("json/2a.json")
+df2b= pd.read_json("json/2b.json")
+df_1 = df['processed_text'].sample(frac=0.00001, random_state=1)
+df_1.reset_index(drop=True, inplace=True)
+df_2 = df['processed_text'].sample(frac=0.00001, random_state=2)
+df_2.reset_index(drop=True, inplace=True)
+df_3 = df['processed_text'].sample(frac=0.00001, random_state=3)
+df_3.reset_index(drop=True, inplace=True)
+df_4 = df['processed_text'].sample(frac=0.00001, random_state=4)
+df_4.reset_index(drop=True, inplace=True)
 
 # 2. Clean Text
 ### clean user_input 
@@ -65,30 +77,11 @@ def pre_process(text):
     
     return user_input
 
-### Transform Data
-
-#df['class'] = df['class'].apply(lambda x: 0 if x == 'negative' or x== 'neutral' else 1 )
-
-#3. Buil Model
-#vectorizer = dict(ngram_range=(1, 2), min_df=5, max_df=0.8)
-#X_train, X_test, y_train, y_test = train_test_split(df['processed_text'], df['class'], test_size=0.2)
-#pipeline = Pipeline(
-    #[
-        #("vect", CountVectorizer(**vectorizer)),
-        #("tfidf", TfidfTransformer()),
-        #('smt', RandomOverSampler()),
-        #("clf", LogisticRegression(C=100, solver='newton-cg', penalty='l2'))
-    #])
-#model = pipeline.fit(X_train, y_train)
-
 # Pickle
 pkl_filename = "sentiment_bestmodel.pkl"  
 pkl_count = "feature.pkl"  
 
-
-
-#6. Load models 
-# Đọc model
+# Load models 
 with open(pkl_filename, 'rb') as file:  
     sentiment_model= pickle.load(file)
 
@@ -99,9 +92,6 @@ loaded_vec = CountVectorizer(decode_error="replace",vocabulary=pickle.load(open(
 
 #Caching the model for faster loading
 #@st.cache
-
-
-
 
 # GUI
 menu = ["Business Objective","Model Selection and Result", "New Prediction"]
@@ -206,6 +196,7 @@ elif choice == "Model Selection and Result":
     PySpark's MLlib library to train a Logistic Regression and Naive Bayes model
     """)
     st.image("photo/pyspark.jpg")
+    ### 3C
     st.write("""
     ##### 3 Classes - NaiveBayes
     """)
@@ -213,7 +204,8 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.image("photo/p31.png")
+    st.dataframe(df3a['3-Class Confusion Matrix'])
+
     st.write("""
     ##### 3 Classes - LogisticRegression
     """)
@@ -222,12 +214,13 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.image("photo/p32.png")
+    st.dataframe(df3b['3-Class Confusion Matrix'])
     st.write("""
     #####
     Even though Naive Bayes gives better results than Logistic Regression, classification model has a poor performance
     """)
 
+    ###2C
     st.write("""
     ##### 2 Classes - NaiveBayes
     """)
@@ -235,7 +228,8 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.image("photo/p21.png")
+    st.dataframe(df2a['2-Class Confusion Matrix'])
+
     st.write("""
     ##### 2 Classes - LogisticRegression
     """)
@@ -244,7 +238,7 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.image("photo/p22.png")
+    st.dataframe(df2b['2-Class Confusion Matrix'])
     st.write("""
     #####
     Based on the evaluation metrics, it appears that Logistic Regression performed better than Naive Bayes in terms of classification ability, despite the fact that the Accuracy score and confusion matrix yielded similar results to traditional Machine Learning models. Therefore, Logistic Regression may be a better option for this particular problem, despite the similarity in performance metrics to traditional models.
@@ -254,6 +248,22 @@ elif choice == "Model Selection and Result":
 
 
 elif choice == 'New Prediction':
+    st.write("""
+    ####
+    - Used model: Logistic Regression
+    - Output: 
+        + Negative: Rating 1,2,3
+        + Positive: Rating 4,5
+    """)
+    st.write("""
+    Params tuned
+    """)
+    st.code("Best Params: {'C': 1.0, 'penalty': 'l2', 'solver': 'lbfgs'}")
+    st.code('Accuracy score for the best model on the training data: 73.1 ')
+    st.code('Accuracy score for the best model on the training data: 73.2 ')
+    ### result:
+
+
     st.subheader("Data Entry")
     st.write('White a comment')
     cmt= st.text_area(label= "")
@@ -276,28 +286,75 @@ elif choice == 'New Prediction':
     
     ## 
     st.subheader("Data Selection")
-    st.write("""Please input a number, and a random data point will be selected !!
-    """)
-    num = st.number_input(label="", value=1)
-    sub = st.button('Submit')
+    option = st.selectbox('Please select your Dataset',("Dateset 01", "Dateset 02", "Dateset 03", "Dateset 04"))
+    st.write('You selected: ', option )
+    submit1 = st.button('Predict')
+    if submit1:
+        if option == "Dateset 01":
+            st.dataframe(df_1)
+            tfidf2_1 = transformer.fit_transform(loaded_vec.fit_transform(df_1))
 
-    if sub:
-        df_index = df['processed_text'][num]
-        df_index  = [df_index]
-        st.write('You have just selected: ', df_index)
-        tfidf2 = transformer.fit_transform(loaded_vec.fit_transform(df_index))
+            ###
+            result_1 = sentiment_model.predict(tfidf2_1)
+            df_r1 = pd.DataFrame(result_1)
+            df_r1['Prediction'] = df_r1
+        
+            df_r1= df_r1.applymap(lambda x: 'Negative' if x == 0 else 'Positive')
+            r1= pd.concat([df_1,df_r1], axis=1)
+            r1 = r1[['processed_text', 'Prediction']]
+            st.write("""
+            ##### Result
+            """)
+            st.write(r1)
+        if option == "Dateset 02":
+            st.dataframe(df_2)
+            tfidf2_2 = transformer.fit_transform(loaded_vec.fit_transform(df_2))
 
-        text2 = tfidf2.toarray()
-        result2 = sentiment_model.predict(text2)
-        ng2= ""
-        if result2 == 0:
-            ng2 = 'Negative'
-        else:
-            ng2 = 'positive'
-            
-        st.write("The emotional tone of comment is: ",    (ng2))
+            ###
+            result_2 = sentiment_model.predict(tfidf2_2)
+            df_r2 = pd.DataFrame(result_2)
+            df_r2['Prediction'] = df_r2
+        
+            df_r2 = df_r2.applymap(lambda x: 'Negative' if x == 0 else 'Positive')
+            r2= pd.concat([df_2,df_r2], axis=1)
+            r2 = r2[['processed_text', 'Prediction']]
+            st.write("""
+            ##### Result
+            """)
+            st.write(r2)
+        if option == "Dateset 03":
+            st.dataframe(df_3)
+            tfidf2_3 = transformer.fit_transform(loaded_vec.fit_transform(df_3))
 
-    st.image("photo/icon.png")
+            ###
+            result_3 = sentiment_model.predict(tfidf2_3)
+            df_r3 = pd.DataFrame(result_3)
+            df_r3['Prediction'] = df_r3
+        
+            df_r3 = df_r3.applymap(lambda x: 'Negative' if x == 0 else 'Positive')
+            r3= pd.concat([df_3,df_r3], axis=1)
+            r3 = r3[['processed_text', 'Prediction']]
+            st.write("""
+            ##### Result
+            """)
+            st.write(r3)
+        if option == "Dateset 04":
+            st.dataframe(df_4)
+            tfidf2_4 = transformer.fit_transform(loaded_vec.fit_transform(df_4))
+
+            ###
+            result_4 = sentiment_model.predict(tfidf2_4)
+            df_r4 = pd.DataFrame(result_4)
+            df_r4['Prediction'] = df_r4
+        
+            df_r4 = df_r4.applymap(lambda x: 'Negative' if x == 0 else 'Positive')
+            r4= pd.concat([df_4,df_r4], axis=1)
+            r4 = r4[['processed_text', 'Prediction']]
+            st.write("""
+            ##### Result
+            """)
+            st.write(r4)
+    st.image("photo/icon.jpg")
 
     
 
