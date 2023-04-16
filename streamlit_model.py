@@ -33,10 +33,6 @@ st.write("---------------------------------------------------")
 # 1. Read Processed_Data
 #@st.cache
 df = pd.read_csv("new_shopee.csv", encoding='utf-8')
-df3a= pd.read_json("json/3a.json")
-df3b= pd.read_json("json/3b.json")
-df2a= pd.read_json("json/2a.json")
-df2b= pd.read_json("json/2b.json")
 df_1 = df['processed_text'].sample(frac=0.00001, random_state=1)
 df_1.reset_index(drop=True, inplace=True)
 df_2 = df['processed_text'].sample(frac=0.00001, random_state=2)
@@ -205,7 +201,11 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.dataframe(df3a['3-Class Confusion Matrix'])
+    st.code("""
+    [150367, 8752, 25299]
+    [6913,   32719,14218]
+    [8742,   8608, 15026]""")
+    #st.dataframe(df3a['3-Class Confusion Matrix'])
 
     st.write("""
     ##### 3 Classes - LogisticRegression
@@ -215,7 +215,10 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.dataframe(df3b['3-Class Confusion Matrix'])
+    st.code("""
+    [179303, 3889, 1157]
+    [27578,  25361,911]
+    [24147,  6474, 1755]""")
     st.write("""
     #####
     Even though Naive Bayes gives better results than Logistic Regression, classification model has a poor performance
@@ -229,7 +232,10 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.dataframe(df2a['2-Class Confusion Matrix'])
+    st.code("""
+    [78292, 13963]
+    [17618, 68842]
+    """)
 
     st.write("""
     ##### 2 Classes - LogisticRegression
@@ -239,7 +245,10 @@ elif choice == "Model Selection and Result":
     st.write("""
     ###### Confusion Matrix
     """)
-    st.dataframe(df2b['2-Class Confusion Matrix'])
+    st.code("""
+    [78556, 13699]
+    [12464, 73996]
+    """)
     st.write("""
     #####
     Based on the evaluation metrics, it appears that Logistic Regression performed better than Naive Bayes in terms of classification ability, despite the fact that the Accuracy score and confusion matrix yielded similar results to traditional Machine Learning models. Therefore, Logistic Regression may be a better option for this particular problem, despite the similarity in performance metrics to traditional models.
